@@ -1,0 +1,6 @@
+{
+  "name": "DamonFix AI",
+  "description": "Universal code debugger and AI learning assistant for students. Upload or paste code for instant bug detection, side-by-side fixes, and easy-to-understand explanations in English or Taglish.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
