@@ -150,7 +150,7 @@ async function callGemini(
   const client = getGeminiClient();
   if (!client) return null;
 
-  const candidateModels = ['gemini-3.6-flash', 'gemini-3.8-flash', 'gemini-flash-latest', 'gemini-3.1-flash-lite'];
+  const candidateModels = ['gemini-3.1-flash-lite', 'gemini-flash-latest', 'gemini-3.8-flash', 'gemini-3.1-pro-preview'];
   for (const modelName of candidateModels) {
     try {
       const response = await client.models.generateContent({
@@ -531,7 +531,7 @@ Please answer the student's question clearly.`;
   // 1. Try Gemini
   const client = getGeminiClient();
   if (client) {
-    const candidateModels = ['gemini-3.6-flash', 'gemini-3.8-flash', 'gemini-flash-latest', 'gemini-3.1-flash-lite'];
+    const candidateModels = ['gemini-3.1-flash-lite', 'gemini-flash-latest', 'gemini-3.8-flash', 'gemini-3.1-pro-preview'];
     for (const modelName of candidateModels) {
       try {
         const response = await client.models.generateContent({

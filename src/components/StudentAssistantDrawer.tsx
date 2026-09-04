@@ -55,6 +55,7 @@ export const StudentAssistantDrawer: React.FC<StudentAssistantDrawerProps> = ({
   // Handle triggered questions from parent buttons
   useEffect(() => {
     if (initialQuestion) {
+      setIsExpanded(true);
       sendMessage(initialQuestion);
       if (onClearInitialQuestion) {
         onClearInitialQuestion();
