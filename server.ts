@@ -11,7 +11,9 @@ import {
 dotenv.config();
 
 const app = express();
-const PORT = 3000;
+// When running in AI Studio, APPLET_ID is set and Nginx proxies strictly to port 3000.
+// On cloud deployments (Railway, Render, Fly.io, Cloud Run), listen on process.env.PORT provided by the host.
+const PORT = process.env.APPLET_ID ? 3000 : (Number(process.env.PORT) || 3000);
 
 app.use(express.json({ limit: '10mb' }));
 
@@ -428,8 +430,15 @@ function getFallbackAnalysis(code: string, userLang?: string, explanationLanguag
 }
 
 async function startServer() {
-  // Vite middleware in dev, static files in production
-  if (process.env.NODE_ENV !== 'production') {
+  // Determine if running as compiled production bundle or standalone deployment (Railway, Cloud Run, etc.)
+  const isProduction =
+    process.env.NODE_ENV === 'production' ||
+    Boolean(process.env.RAILWAY_ENVIRONMENT) ||
+    Boolean(process.env.RAILWAY_SERVICE_ID) ||
+    !process.env.APPLET_ID ||
+    process.argv[1]?.includes('dist');
+
+  if (!isProduction) {
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: 'spa',
@@ -444,7 +453,7 @@ async function startServer() {
   }
 
   app.listen(PORT, '0.0.0.0', () => {
-    console.log(`DamonFix AI server running on http://0.0.0.0:${PORT}`);
+    console.log(`DamonFix AI server running on http://0.0.0.0:${PORT} [mode: ${isProduction ? 'production' : 'development'}]`);
   });
 }
 
