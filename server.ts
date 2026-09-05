@@ -71,7 +71,7 @@ app.post('/api/analyze', async (req: Request, res: Response) => {
 // Follow-up Student AI Chat endpoint with failover
 app.post('/api/chat', async (req: Request, res: Response) => {
   try {
-    const { code, fixedCode, question, explanationLanguage = 'english' } = req.body;
+    const { code, fixedCode, question, explanationLanguage = 'english', history = [] } = req.body;
 
     if (!question || typeof question !== 'string' || !question.trim()) {
       res.status(400).json({ error: 'Question is required.' });
@@ -82,17 +82,18 @@ app.post('/api/chat', async (req: Request, res: Response) => {
       question,
       code || '',
       fixedCode || '',
-      explanationLanguage === 'taglish' ? 'taglish' : 'english'
+      explanationLanguage === 'taglish' ? 'taglish' : 'english',
+      Array.isArray(history) ? history : []
     );
 
     res.json(chatResponse);
   } catch (err: any) {
     console.error('Error in /api/chat:', err);
-    const fallbackReply =
-      req.body?.explanationLanguage === 'taglish'
-        ? 'Magandang tanong! Laging tandaan na i-check ang base-0 indexing at variable declarations bago mag-run.'
-        : 'Good question! Always make sure to verify 0-based indexing and variable scoping before executing.';
-    res.json({ reply: fallbackReply, aiProviderUsed: 'DamonFix Local Tutor Knowledge Base' });
+    const isTaglish = req.body?.explanationLanguage === 'taglish';
+    const fallbackReply = isTaglish
+      ? 'Magandang tanong! Tandaan na i-verify ang 0-based indexing at variable types habang nagde-debug.'
+      : 'Great question! Remember to check 0-based indexing and variable scoping while tracing your code.';
+    res.json({ reply: fallbackReply, aiProviderUsed: 'Damon Smart Tutor Engine' });
   }
 });
 

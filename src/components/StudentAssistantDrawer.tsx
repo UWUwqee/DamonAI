@@ -87,7 +87,7 @@ export const StudentAssistantDrawer: React.FC<StudentAssistantDrawerProps> = ({
           fixedCode: fixedCode,
           question: q,
           explanationLanguage,
-          history: messages.slice(-4),
+          history: messages.slice(-6),
         }),
       });
 
@@ -101,6 +101,7 @@ export const StudentAssistantDrawer: React.FC<StudentAssistantDrawerProps> = ({
         sender: 'assistant',
         text: data.reply || 'No answer received.',
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        provider: data.aiProviderUsed,
       };
       setMessages((prev) => [...prev, botMsg]);
     } catch (err: any) {
@@ -205,13 +206,23 @@ export const StudentAssistantDrawer: React.FC<StudentAssistantDrawerProps> = ({
                   }`}
                 >
                   <p className="whitespace-pre-wrap">{msg.text}</p>
-                  <span
-                    className={`block text-[10px] font-mono mt-1 text-right ${
-                      msg.sender === 'user' ? 'text-indigo-200/80' : 'text-slate-500'
-                    }`}
-                  >
-                    {msg.timestamp}
-                  </span>
+                  <div className="flex items-center justify-between gap-3 mt-1.5 pt-1 border-t border-slate-800/50 text-[10px] font-mono">
+                    {msg.provider ? (
+                      <span className="text-cyan-400/90 truncate flex items-center gap-1">
+                        <Sparkles className="w-2.5 h-2.5 shrink-0" />
+                        {msg.provider}
+                      </span>
+                    ) : (
+                      <span />
+                    )}
+                    <span
+                      className={`ml-auto ${
+                        msg.sender === 'user' ? 'text-indigo-200/80' : 'text-slate-500'
+                      }`}
+                    >
+                      {msg.timestamp}
+                    </span>
+                  </div>
                 </div>
 
                 {msg.sender === 'user' && (

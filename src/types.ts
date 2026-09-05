@@ -51,6 +51,7 @@ export interface ChatMessage {
   sender: 'user' | 'assistant';
   text: string;
   timestamp: string;
+  provider?: string;
 }
 
 export interface SampleSnippet {
