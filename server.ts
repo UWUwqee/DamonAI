@@ -267,9 +267,9 @@ function getFallbackAnalysis(code: string, userLang?: string, explanationLanguag
                 : 'C++ uses manual memory management. Without calling delete[], allocated heap blocks remain orphaned in memory.',
             fixApplied: 'Added delete[] grades; prior to function return.',
             originalSnippet: 'return 0;',
-            fixedSnippet: 'delete[] grades;\n    return 0;',
+            fixedSnippet: 'delete[] grades;\\n    return 0;',
           });
-          fixedCode = fixedCode.replace('return 0;', 'delete[] grades;\n    return 0;');
+          fixedCode = fixedCode.replace('return 0;', 'delete[] grades;\\n    return 0;');
         }
       }
     });
@@ -366,7 +366,7 @@ function getFallbackAnalysis(code: string, userLang?: string, explanationLanguag
           originalSnippet: line.trim(),
           fixedSnippet: 'HAVING AVG(e.final_grade) >= 85.0',
         });
-        fixedCode = fixedCode.replace(line, '-- Aggregate filtered in HAVING clause\nGROUP BY s.student_id, s.full_name\nHAVING AVG(e.final_grade) >= 85.0');
+        fixedCode = fixedCode.replace(line, '-- Aggregate filtered in HAVING clause\\nGROUP BY s.student_id, s.full_name\\nHAVING AVG(e.final_grade) >= 85.0');
       }
     });
   }
@@ -428,24 +428,38 @@ function getFallbackAnalysis(code: string, userLang?: string, explanationLanguag
 }
 
 async function startServer() {
-  // Vite middleware in dev, static files in production
-  if (process.env.NODE_ENV !== 'production') {
-    const vite = await createViteServer({
-      server: { middlewareMode: true },
-      appType: 'spa',
-    });
-    app.use(vite.middlewares);
-  } else {
-    const distPath = path.join(process.cwd(), 'dist');
-    app.use(express.static(distPath));
-    app.get('*', (req, res) => {
-      res.sendFile(path.join(distPath, 'index.html'));
-    });
-  }
+  try {
+    // Vite middleware in dev, static files in production
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('Starting in development mode with Vite...');
+      const vite = await createViteServer({
+        server: { middlewareMode: true },
+        appType: 'spa',
+      });
+      app.use(vite.middlewares);
+      console.log('Vite middleware loaded');
+    } else {
+      console.log('Starting in production mode with static files...');
+      const distPath = path.join(process.cwd(), 'dist');
+      app.use(express.static(distPath));
+      app.get('*', (req, res) => {
+        res.sendFile(path.join(distPath, 'index.html'));
+      });
+      console.log('Static files configured');
+    }
 
-  app.listen(PORT, '0.0.0.0', () => {
-    console.log(`DamonFix AI server running on http://0.0.0.0:${PORT}`);
-  });
+    app.listen(PORT, '0.0.0.0', () => {
+      console.log(`DamonFix AI server running on http://0.0.0.0:${PORT}`);
+    });
+  } catch (error) {
+    console.error('Failed to start server:', error);
+    process.exit(1);
+  }
 }
 
-startServer();
+// Start the server with proper error handling
+startServer().catch((error) => {
+  console.error('Unhandled error in startServer:', error);
+  process.exit(1);
+});
+
